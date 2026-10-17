@@ -1,0 +1,68 @@
+import type { Film } from '../types/cinema';
+
+export const FILMS: Film[] = [
+  {
+    id: 'interstellar',
+    title: 'Interstellar',
+    director: 'Christopher Nolan',
+    year: 2014,
+    runtime: '169 min',
+    description: 'A team of explorers travels through a wormhole in space in an attempt to ensure humanity’s survival across uncharted galaxies.',
+    atmosphere: 'Deep cosmic burgundy and gold',
+    themeColors: {
+      primary: '#100B0D',
+      accent: '#9BCBDD',
+      glow: '#481B29',
+    },
+    image: '/images/gallery/interstellar.jpg',
+    imageAlt: 'Astronaut standing on shallow ocean planet with massive luminous black hole accretion disk',
+  },
+  {
+    id: 'the-dark-knight',
+    title: 'The Dark Knight',
+    director: 'Christopher Nolan',
+    year: 2008,
+    runtime: '152 min',
+    description: 'When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological tests of his ability to fight injustice.',
+    atmosphere: 'Cold charcoal and obsidian',
+    themeColors: {
+      primary: '#100B0D',
+      accent: '#5B7BA6',
+      glow: '#1A2332',
+    },
+    image: '/images/gallery/dark-knight.jpg',
+    imageAlt: 'Masked vigilante perched atop gothic skyscraper gargoyle overlooking rain-slicked Gotham at midnight',
+  },
+  {
+    id: 'dune-part-two',
+    title: 'Dune: Part Two',
+    director: 'Denis Villeneuve',
+    year: 2024,
+    runtime: '166 min',
+    description: 'Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family in an all-out battle for the universe.',
+    atmosphere: 'Desert amber and burgundy',
+    themeColors: {
+      primary: '#100B0D',
+      accent: '#D4803C',
+      glow: '#481B29',
+    },
+    image: '/images/gallery/dune-two.jpg',
+    imageAlt: 'Desert warrior standing on windswept sand dune ridge under dual celestial moons with shimmering spice dust',
+  },
+  {
+    id: 'oppenheimer',
+    title: 'Oppenheimer',
+    director: 'Christopher Nolan',
+    year: 2023,
+    runtime: '180 min',
+    description: 'The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb that redefined human civilization.',
+    atmosphere: 'Incandescent gold and deep crimson',
+    themeColors: {
+      primary: '#100B0D',
+      accent: '#E03C31',
+      glow: '#4A121A',
+    },
+    image: '/images/gallery/oppenheimer.jpg',
+    imageAlt: 'Silhouette of a 1940s physicist in trench coat observing a colossal atomic explosion in the night desert',
+  },
+];

@@ -1,84 +1,120 @@
-# CINÉRA — Curated Cinema
+# CINÉRA — Curated Cinema Platform
 
 > *“Your seat. Your story.”*
 
-CINÉRA is a premium cinema curation and ticket-booking experience engineered around a signature WebGL projection hero stage ("FIRST LIGHT"), 70mm large-format film curation, and luxury editorial aesthetics.
+CINÉRA is an architectural luxury movie-booking platform engineered around an immersive, fullscreen **Concave Cinema Gallery** ("THE ICONIC COLLECTION"). The visitor experiences a curved architectural wall of cinematic memories suspended in deep Obsidian darkness with subtle Burgundy atmospheric warmth.
 
-The master architecture, creative concept, and engineering specifications are documented in [`docs/CINERA_SPEC.md`](docs/CINERA_SPEC.md).
+---
+
+## Technical Stack
+- **Framework**: React 19 + TypeScript + Vite
+- **Styling**: Tailwind CSS v4 + Pure CSS 3D Transforms (`perspective: 1100px`, `transform-style: preserve-3d`)
+- **Routing**: React Router v7
+- **Motion Controller**: Native `requestAnimationFrame` damped inertia loop with GSAP hooks for entrance choreography
+- **Typography**: Cormorant Garamond (Editorial Serif), Plus Jakarta Sans (UI), JetBrains Mono (Archival Metadata)
 
 ---
 
 ## Getting Started
 
-### Prerequisites
-- Node.js 18+
-- npm 9+
-
-### Installation & Development
+### Installation
 ```bash
-# Install dependencies
 npm install
+```
 
-# Start local development server
+### Development Server
+```bash
 npm run dev
+```
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-# Typecheck and production bundle build
-npm run build
+### Quality Verification
+```bash
+# Typecheck
+npm run typecheck
 
-# Run linter
+# Linter (Oxlint)
 npm run lint
+
+# Production Bundle Build
+npm run build
 ```
 
 ---
 
-## Adding Film Image Assets
-
-Film poster and backdrop assets are placed in the `public/films/` directory according to film slug:
+## Project Structure
 
 ```
-public/
-  films/
-    interstellar/
-      poster.webp     # 1000x1500 2:3 vertical poster
-      backdrop.webp   # 1920x1080 16:9 cinematic still
-    the-dark-knight/
-      poster.webp
-      backdrop.webp
-    oppenheimer/
-      poster.webp
-      backdrop.webp
-    dune-part-two/
-      poster.webp
-      backdrop.webp
+cinera/
+├── docs/
+│   ├── CINERA-CREATIVE-DIRECTION.md   # Master concept & spatial math
+│   └── CINERA_SPEC.md                # Multi-phase blueprint
+├── AGENTS.md                          # Coding guidelines & standards
+├── README.md
+├── public/
+│   ├── fonts/                         # Self-hosted display fonts
+│   └── images/
+│       ├── gallery/                   # High-resolution film stills
+│       └── hero/                      # Key art assets
+├── src/
+│   ├── app/
+│   │   └── router.tsx                 # Route declarations (/ and /movies)
+│   ├── components/
+│   │   ├── landing/
+│   │   │   ├── ConcaveGallery.tsx     # Fullscreen coordinator & refs
+│   │   │   ├── CinemaTile.tsx         # Individual 3D concave tile
+│   │   │   ├── PerimeterHUD.tsx       # Stationary luxury interface overlay
+│   │   │   ├── GalleryStage.tsx       # 3D perspective & pointer inertia stage
+│   │   │   └── GalleryFallback.tsx    # Responsive mobile fallback
+│   │   └── ui/
+│   │       └── BrandWordmark.tsx      # CINÉRA brand mark
+│   ├── data/
+│   │   ├── films.ts                   # Typed 4-film dataset
+│   │   └── galleryLayout.ts           # 15-tile spatial matrix & math
+│   ├── hooks/
+│   │   ├── usePointerInertia.ts       # Damped pointer inertia controller
+│   │   └── useReducedMotion.ts        # Accessibility reduced-motion detection
+│   ├── pages/
+│   │   ├── LandingPage.tsx            # Concave gallery entry route
+│   │   └── MoviesPage.tsx             # NOW SHOWING repertory placeholder
+│   ├── styles/
+│   │   ├── globals.css                # Design tokens & typography
+│   │   └── gallery.css                # 3D perspective & tile transitions
+│   ├── types/
+│   │   └── cinema.ts                  # Shared TypeScript interfaces
+│   ├── App.tsx                        # Root layout & Router provider
+│   └── main.tsx                       # React DOM entry
+├── package.json
+└── vite.config.ts
 ```
-
-### Zero-Image Fallback Engine
-If an image file is absent or fails to load, CINÉRA automatically synthesizes a procedural archival canvas plate (`src/lib/fallbackTexture.ts`):
-- Deep obsidian-to-accent atmospheric gradients
-- Instrument Serif display typography with gold italic accents
-- Real-time procedural film grain and aperture geometry
-- Gold hairlines and IBM Plex Mono archival metadata
-
-To test the zero-images fallback mode at any time, append `?noimages=1` to the URL.
 
 ---
 
-## Feature Flags & Debug Tooling
+## Current Implemented Features (Phase 01)
 
-### Feature Flags (`src/config/features.ts`)
-Features can be toggled to support low-power devices and testing:
-- `lenis`: Smooth native scrolling
-- `cursor`: Fine-pointer custom dot and magnetic ring cursor
-- `dust`: 2D canvas floating dust particles
-- `beam`: Projector beam cone and flicker
-- `shaderTransition`: WebGL iris dissolve shader
-- `debug`: Enable internal debug mode
+- **Concave 3D Spatial Matrix**: 15 cinematic tiles arranged in a 5-column × 3-row layout, curved inwards using pure CSS 3D perspective (`depth = (nx² + ny²) * 220 - 100`, `rotateY`, `rotateX`, `scale`).
+- **Pointer-Driven Fluid Inertia**: Damped mouse-responsive camera movement (`current += (target - current) * 0.055`, X: ±180px, Y: ±110px) isolated on the outer stage wrapper.
+- **Dynamic Tile Hover Recognition**: Active tile elevates to `brightness(1.12)`, unrelated tiles dim to `0.55 opacity`, and the top Perimeter HUD updates dynamically to show `FILM TITLE — DIRECTOR`.
+- **Keyboard Navigation**: Full tab accessibility across all tiles with focus rings and HUD synchronization.
+- **Stationary Perimeter HUD**: Fixed overlay with `REPERTORY INDEX`, `CINÉRA`, `EXPLORE MOVIES`, and `MOVE TO EXPLORE` guidance.
+- **Graceful Asset Fallback**: If an image is missing or blocked, procedural archival canvas plates are synthesized with zero broken images.
+- **Responsive Mobile Fallback**: Screen-optimized editorial card presentation on small viewports (<640px).
 
-### Debug HUD (`?debug=1`)
-Append `?debug=1` to any route URL to reveal the live diagnostic HUD:
-- Real-time FPS counter
-- Device Pixel Ratio (DPR)
-- Scroll progress and active reel index (01—04)
-- Window transition coordinates (`from`, `to`, `t`)
-- Active ScrollTrigger count
-- WebGL geometry and texture memory allocation
+---
+
+## Roadmap
+
+- **Phase 02**: *The Monolith Convergence* — Scroll-driven transformation where outer rows exit and the 5 middle-row tiles collapse into a central panoramic monolith.
+- **Phase 03**: *Monolith Portal & Booking* — Reel switching, 70mm archival projection details, interactive seat map, and booking reservation flow.
+
+---
+
+## Asset Replacement Instructions
+
+Place cinematic movie stills under `public/images/gallery/`:
+- `interstellar.jpg` (Interstellar - Christopher Nolan)
+- `dark-knight.jpg` (The Dark Knight - Christopher Nolan)
+- `dune-two.jpg` (Dune: Part Two - Denis Villeneuve)
+- `oppenheimer.jpg` (Oppenheimer - Christopher Nolan)
+
+Recommended format: WebP or JPEG, minimum resolution 1920×1080.

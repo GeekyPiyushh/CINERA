@@ -1,0 +1,62 @@
+/**
+ * CINÉRA — Concave 3D Spatial Gallery Styles
+ */
+
+/* 3D Perspective Stage */
+.perspective-stage {
+  perspective: 1100px;
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* 3D Preserve context container */
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+/* Subtle luxury grain */
+.cinema-grain {
+  background-image: radial-gradient(rgba(245, 233, 221, 0.04) 1px, transparent 0);
+  background-size: 20px 20px;
+}
+
+/* Hairline borders */
+.hairline-gold {
+  border: 1px solid rgba(198, 167, 124, 0.25);
+}
+
+.hairline-gold-hover:hover {
+  border-color: rgba(198, 167, 124, 0.6);
+}
+
+/* Tile hover interaction transitions */
+.cinema-tile {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.35s ease-out,
+              opacity 0.35s ease-out,
+              box-shadow 0.35s ease-out;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* When a tile is hovered, dim unrelated tiles */
+.gallery-has-hover .cinema-tile:not(.is-active) {
+  opacity: 0.55;
+  filter: brightness(0.85) grayscale(20%);
+}
+
+.cinema-tile.is-active {
+  filter: brightness(1.12) contrast(1.04);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(198, 167, 124, 0.15);
+  z-index: 20;
+}
+
+/* Crop marks */
+.crop-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: rgba(198, 167, 124, 0.35);
+  pointer-events: none;
+}
