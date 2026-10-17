@@ -9,7 +9,7 @@ import { ConcaveGallery } from '../components/landing/ConcaveGallery';
  */
 export const LandingPage: React.FC = () => {
   return (
-    <main className="relative w-screen h-screen overflow-hidden bg-[#100B0D]">
+    <main className="relative w-full bg-[#100B0D] select-none">
       <ConcaveGallery />
     </main>
   );

@@ -28,7 +28,7 @@ export const GalleryFallback: React.FC = () => {
       </header>
 
       {/* Curated Mobile Cinema Cards */}
-      <div className="relative z-10 py-10 space-y-6">
+      <div className="relative z-10 py-6 space-y-6">
         {FILMS.map((film, index) => (
           <Link
             key={film.id}
@@ -65,11 +65,51 @@ export const GalleryFallback: React.FC = () => {
         ))}
       </div>
 
+      {/* Mobile Featured Cinema Monolith Section (Phase 02 Mobile Transformation) */}
+      <div className="relative z-10 my-10 pt-8 border-t border-[#C6A77C]/20 text-center space-y-6">
+        <div className="font-mono text-[10px] tracking-[0.25em] text-[#C6A77C] uppercase">
+          FEATURED REPERTORY MONOLITH
+        </div>
+
+        {/* 3-Strip Mobile Panoramic Monolith */}
+        <div className="relative overflow-hidden border border-[#C6A77C]/40 shadow-[0_20px_50px_rgba(0,0,0,0.95)]">
+          <div className="grid grid-cols-3 aspect-[16/9] overflow-hidden">
+            {[0, 1, 2].map((stripIdx) => (
+              <div key={stripIdx} className="relative h-full overflow-hidden border-r border-[#C6A77C]/15 last:border-r-0">
+                <img
+                  src="/images/hero/interstellar.jpg"
+                  alt="Interstellar Cinema Frame"
+                  className="absolute top-0 h-full max-w-none object-cover"
+                  style={{
+                    width: '300%',
+                    left: `-${stripIdx * 100}%`,
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Oversized Interstellar Title */}
+        <div className="font-serif text-4xl sm:text-5xl tracking-[0.16em] uppercase text-[#F5E9DD] leading-none pt-2">
+          INTERSTELLAR
+        </div>
+
+        {/* Mobile Metadata */}
+        <div className="flex justify-center items-center gap-3 font-mono text-[10px] tracking-[0.2em] text-[#F5E9DD]/70 uppercase">
+          <span>CHRISTOPHER NOLAN</span>
+          <span className="w-1 h-1 rounded-full bg-[#C6A77C]" />
+          <span>2014</span>
+          <span className="w-1 h-1 rounded-full bg-[#C6A77C]" />
+          <span>169 MIN</span>
+        </div>
+      </div>
+
       {/* Mobile Footer CTA */}
       <footer className="relative z-10 text-center pb-6">
         <Link
           to="/movies"
-          className="inline-block w-full py-3.5 border border-[#C6A77C] bg-[#C6A77C] text-[#100B0D] font-mono text-xs tracking-[0.2em] uppercase font-semibold text-center shadow-[0_0_25px_rgba(198,167,124,0.25)]"
+          className="inline-block w-full py-3.5 border border-[#C6A77C] bg-[#C6A77C] text-[#100B0D] font-mono text-xs tracking-[0.2em] uppercase font-semibold text-center shadow-[0_0_25px_rgba(198,167,124,0.25)] hover:bg-[#F5E9DD] transition-colors"
         >
           Explore All Movies
         </Link>

@@ -4,6 +4,8 @@ import { useReducedMotion } from '../../hooks/useReducedMotion';
 
 interface GalleryStageProps {
   children: React.ReactNode;
+  influenceRef?: React.RefObject<number>;
+  stageRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 /**
@@ -12,17 +14,21 @@ interface GalleryStageProps {
  * The inner wrapper handles pointer-driven inertial translation (X: ±180px, Y: ±110px)
  * completely separated from tile-level concave transforms.
  */
-export const GalleryStage: React.FC<GalleryStageProps> = ({ children }) => {
+export const GalleryStage: React.FC<GalleryStageProps> = ({ children, influenceRef, stageRef }) => {
   const prefersReducedMotion = useReducedMotion();
   const inertiaRef = usePointerInertia<HTMLDivElement>({
     maxX: 180,
     maxY: 110,
     damping: 0.055,
     disabled: prefersReducedMotion,
+    influenceRef,
   });
 
   return (
-    <div className="relative w-screen h-screen h-[100dvh] overflow-hidden bg-[#100B0D] perspective-stage flex items-center justify-center select-none">
+    <div
+      ref={stageRef}
+      className="relative w-screen h-screen h-[100dvh] overflow-hidden bg-[#100B0D] perspective-stage flex items-center justify-center select-none"
+    >
       {/* Deep Burgundy ambient background glow */}
       <div
         className="absolute inset-0 pointer-events-none"

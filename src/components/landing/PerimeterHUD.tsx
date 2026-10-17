@@ -5,12 +5,16 @@ import type { GalleryHUDState } from '../../types/cinema';
 
 interface PerimeterHUDProps {
   hoveredFilm: GalleryHUDState['hoveredFilm'];
+  scrollProgress?: number;
 }
 
-export const PerimeterHUD: React.FC<PerimeterHUDProps> = ({ hoveredFilm }) => {
+export const PerimeterHUD: React.FC<PerimeterHUDProps> = ({ hoveredFilm, scrollProgress = 0 }) => {
   const subtitle = hoveredFilm
     ? `${hoveredFilm.title.toUpperCase()} — ${hoveredFilm.director.toUpperCase()}`
     : 'YOUR SEAT. YOUR STORY.';
+
+  const bottomLabel = scrollProgress < 0.05 ? 'MOVE TO EXPLORE' : 'SCROLL TO REVEAL';
+  const showBottomHint = scrollProgress < 0.82;
 
   return (
     <header className="fixed inset-0 pointer-events-none z-30 select-none p-[3vw]">
@@ -48,12 +52,16 @@ export const PerimeterHUD: React.FC<PerimeterHUDProps> = ({ hoveredFilm }) => {
         </Link>
       </div>
 
-      {/* Bottom Center: Interaction Guidance (Phase 01) */}
-      <div className="absolute bottom-[3vw] left-1/2 -translate-x-1/2 text-center pointer-events-auto">
+      {/* Bottom Center: Interaction Guidance (Dynamic Phase 01 / Phase 02) */}
+      <div
+        className={`absolute bottom-[3vw] left-1/2 -translate-x-1/2 text-center pointer-events-auto transition-opacity duration-500 ${
+          showBottomHint ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+      >
         <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-[#C6A77C]/20 bg-[#100B0D]/70 backdrop-blur-sm">
           <span className="w-1 h-1 rounded-full bg-[#C6A77C] animate-pulse" />
           <span className="font-mono text-[10px] tracking-[0.25em] text-[#F5E9DD]/60 uppercase">
-            MOVE TO EXPLORE
+            {bottomLabel}
           </span>
         </div>
       </div>

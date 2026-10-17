@@ -60,17 +60,37 @@ The gallery operates in pure CSS 3D transforms (`perspective: 1100px; transform-
 
 ---
 
-## 4. Phase Roadmap & Future Compatibility
+## 4. Phase 02: The Convergence (Implemented)
 
-### Phase 02: Gallery-to-Monolith Convergence
-- When scroll begins, the top and bottom rows (10 tiles) exit along their perspective curves.
-- The 5 middle-row tiles (Row 1, Cols 0–4) converge toward the center, flattening their 3D rotations.
-- The 5 tiles lock contiguously into a single panoramic monolithic film frame.
-- Oversized movie title typography rises behind the monolithic frame.
-- **Architecture Ready**: All 15 tiles have stable DOM refs in `ConcaveGallery.tsx`, deterministic geometry in `galleryLayout.ts`, and isolated transforms.
+### The Signature Cinematic Transformation
+Phase 02 implements the seamless scroll-driven transformation from the 15-image concave gallery into a single five-strip cinematic monolith:
+- **Act I — The Gallery (0% scroll)**: Full 15-image concave spatial gallery with fluid pointer inertia and dynamic hover recognition.
+- **Act II — The Gallery Releases (0–25% scroll)**:
+  - Pointer inertia settles smoothly to center (`pointerInfluenceRef` damps to 0).
+  - Upper row (5 tiles) floats upward and outward into darkness (`opacity: 0, y: -450px, z: +90px`).
+  - Lower row (5 tiles) floats downward and outward into darkness (`opacity: 0, y: +450px, z: +90px`).
+- **Act III — Five Strips Convergence (20–65% scroll)**:
+  - Five middle-row tiles (Row 1, cols 0..4) converge inward to the center.
+  - Rotations flatten (`rotateX: 0, rotateY: 0, z: 0, scale: 1.0`).
+  - Tile widths normalize to `stripWidth = monolithWidth / 5`, heights normalize to `monolithHeight` (~65vw × 56vh).
+  - Calculated delta X: `deltaX = (stripIndex - 2) * (stripWidth - trackWidth)`.
+  - Borders dissolve to zero-gap contiguous seams.
+- **Act IV — Panorama Reveal (48–78% scroll)**:
+  - Original gallery images cross-fade to shared 20% horizontal slices of the unbroken *Interstellar* panorama (`left: -${stripIndex * 100}%`, `width: 500%`).
+  - Mathematically aligned with zero seams, zero stretching, and zero distortion.
+- **Act V — Monolith Reveal & Giant Typography (65–100% scroll)**:
+  - Oversized `INTERSTELLAR` title in Cormorant Garamond (`~13vw`) emerges behind the frame using a masked vertical reveal.
+  - Central movie frame overlaps the lower title letters, establishing deep spatial layering.
+  - Burgundy atmospheric glow (`#481B29`) blooms behind the frame.
+  - Archival metadata row (`REEL 01 · CHRISTOPHER NOLAN · 2014 · 169 MIN`) and `EXPLORE ALL MOVIES →` CTA appear below the frame.
+- **Bi-Directional Reversibility**: Scrolling upward seamlessly reverses the entire sequence back into the resting 15-tile concave amphitheater.
 
-### Phase 03: Movie Switching & Monolith Portal
-- Pinned scroll transitions between the 4 iconic films.
+---
+
+## 5. Phase Roadmap & Future Boundaries
+
+### Phase 03: Movie Switching & Monolith Portal (Future)
+- Pinned scroll transitions between the 4 canonical films (*The Dark Knight*, *Dune: Part Two*, *Oppenheimer*).
 - Shutter / iris transitions across the monolith frame.
 - Interactive seat selection and private screening booking portal.
 

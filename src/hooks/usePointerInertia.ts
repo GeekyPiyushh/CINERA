@@ -5,6 +5,7 @@ interface PointerInertiaOptions {
   maxY?: number; // max vertical shift in px (default 110)
   damping?: number; // interpolation factor (default 0.055)
   disabled?: boolean;
+  influenceRef?: React.RefObject<number>; // 1.0 (full pointer movement) -> 0.0 (settled to 0)
 }
 
 /**
@@ -12,9 +13,10 @@ interface PointerInertiaOptions {
  * Heavy, fluid pointer-responsive inertial translation for the gallery wrapper.
  * Pure DOM mutation via requestAnimationFrame — zero React state updates per frame.
  * Moves opposite to pointer direction.
+ * Supports influenceRef to allow GSAP scroll controller to gracefully settle motion to 0.
  */
 export function usePointerInertia<T extends HTMLElement>(options: PointerInertiaOptions = {}) {
-  const { maxX = 180, maxY = 110, damping = 0.055, disabled = false } = options;
+  const { maxX = 180, maxY = 110, damping = 0.055, disabled = false, influenceRef } = options;
   const elementRef = useRef<T>(null);
 
   // High-frequency animation values stored in refs
@@ -49,9 +51,14 @@ export function usePointerInertia<T extends HTMLElement>(options: PointerInertia
     const tick = () => {
       const target = targetRef.current;
       const current = currentRef.current;
+      const influence = influenceRef ? influenceRef.current : 1.0;
 
-      current.x += (target.x - current.x) * damping;
-      current.y += (target.y - current.y) * damping;
+      // Scale target by influence (settles to 0 as user scrolls)
+      const effectiveTargetX = target.x * influence;
+      const effectiveTargetY = target.y * influence;
+
+      current.x += (effectiveTargetX - current.x) * damping;
+      current.y += (effectiveTargetY - current.y) * damping;
 
       if (el) {
         el.style.transform = `translate3d(${current.x.toFixed(2)}px, ${current.y.toFixed(2)}px, 0px)`;
@@ -68,7 +75,7 @@ export function usePointerInertia<T extends HTMLElement>(options: PointerInertia
         cancelAnimationFrame(animFrameIdRef.current);
       }
     };
-  }, [maxX, maxY, damping, disabled]);
+  }, [maxX, maxY, damping, disabled, influenceRef]);
 
   return elementRef;
 }

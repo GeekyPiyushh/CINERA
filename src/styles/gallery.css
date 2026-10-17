@@ -32,16 +32,17 @@
 
 /* Tile hover interaction transitions */
 .cinema-tile {
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.35s ease-out,
+  filter: brightness(1) contrast(1);
+  transition: filter 0.35s ease-out,
               opacity 0.35s ease-out,
               box-shadow 0.35s ease-out;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  will-change: transform, opacity;
 }
 
-/* When a tile is hovered, dim unrelated tiles */
-.gallery-has-hover .cinema-tile:not(.is-active) {
+/* When a tile is hovered at rest, dim unrelated tiles */
+.gallery-has-hover:not(.is-scrolling) .cinema-tile:not(.is-active) {
   opacity: 0.55;
   filter: brightness(0.85) grayscale(20%);
 }
@@ -50,6 +51,15 @@
   filter: brightness(1.12) contrast(1.04);
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(198, 167, 124, 0.15);
   z-index: 20;
+}
+
+/* While scrolling/converging, disable pointer events and hover tags */
+.is-scrolling .cinema-tile-card {
+  pointer-events: none !important;
+}
+
+.is-scrolling .tile-hover-tag {
+  opacity: 0 !important;
 }
 
 /* Crop marks */
