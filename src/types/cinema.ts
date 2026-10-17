@@ -8,6 +8,27 @@ export interface FilmThemeColors {
   glow: string; // Ambient aura color
 }
 
+export interface Showtime {
+  id: string;
+  time: string; // e.g. "14:30"
+  format: string; // e.g. "70MM IMAX" | "35MM ARCHIVAL" | "4K DUAL LASER"
+  experience: string; // e.g. "Grand Dome Auditorium"
+  seatsAvailable: number;
+  totalSeats: number;
+  status: 'available' | 'filling-fast' | 'limited';
+  price: string;
+}
+
+export interface CinemaListing {
+  id: string;
+  name: string;
+  location: string;
+  screen: string;
+  projection: string;
+  sound: string;
+  showtimes: Showtime[];
+}
+
 export interface Film {
   id: string;
   slug: string;
@@ -22,6 +43,18 @@ export interface Film {
   image: string; // gallery thumbnail / still
   panoramaImage: string; // high-res wide panorama for monolith
   imageAlt: string;
+
+  // Repertory & Discovery Additions
+  genres?: string[]; // e.g. ["Sci-Fi", "Drama", "Adventure"]
+  language?: string; // e.g. "English"
+  rating?: string; // e.g. "PG-13", "R"
+  curatorNote?: string;
+  cast?: string[];
+  formats?: string[]; // e.g. ["70mm IMAX", "4K Dual Laser"]
+  status?: 'now-showing' | 'coming-soon';
+  featured?: boolean;
+  releaseDate?: string;
+  cinemas?: CinemaListing[];
 }
 
 export type TransitionState = 'idle' | 'transitioning';
