@@ -87,14 +87,35 @@ Phase 02 implements the seamless scroll-driven transformation from the 15-image 
 
 ---
 
-## 5. Phase Roadmap & Future Boundaries
+## 5. Phase 03: The Cinematic Multiverse (Implemented)
 
-### Phase 03: Movie Switching & Monolith Portal (Future)
-- Pinned scroll transitions between the 4 canonical films (*The Dark Knight*, *Dune: Part Two*, *Oppenheimer*).
-- Shutter / iris transitions across the monolith frame.
-- Interactive seat selection and private screening booking portal.
+### Four Films. Four Worlds. One Seamless Cinematic Experience.
+Phase 03 transforms the static *Interstellar* monolith into an interactive four-film cinematic multiverse:
+- **01 — INTERSTELLAR**: Primary `#100B0D`, Ambient aura `#481B29`, Accent `#C6A77C` (Cosmic, mysterious, expansive)
+- **02 — THE DARK KNIGHT**: Primary `#100B0D`, Ambient aura `#1A222D`, Accent `#C6A77C` (Noir, architectural, cold)
+- **03 — DUNE: PART TWO**: Primary `#100B0D`, Ambient aura `#5A2618`, Accent `#C6A77C` (Desert heat, monumental scale, ancient power)
+- **04 — OPPENHEIMER**: Primary `#100B0D`, Ambient aura `#4E2015`, Accent `#D98A3C` (Incandescent, volatile, historical)
+
+### Signature Five-Strip Cinematic Shutter Transition
+When a new film is selected, a 4-stage physics-inspired shutter wave executes across the five monolith strips:
+1. **Stage A — Release (0.0s – 0.18s)**: Strips separate horizontally by a deliberate 5.5px gap (`(i - 2) * 5.5px`), revealing five independent vertical slats.
+2. **Stage B — Cinematic Wave (0.18s – 0.54s)**: Staggered sinusoidal wave (`stagger: 0.045s`) with alternating Y-displacement (`±18px`), subtle perspective rotation (`rotateY: ±4.5°`), and vertical compression (`scaleY: 0.95`).
+3. **Stage C — Double-Buffered Image Replacement at Apex (0.24s – 0.54s)**: Secondary buffer layer (`Buffer B`) cross-fades under the primary buffer (`Buffer A`), swapping the unbroken widescreen panorama seamlessly without any blank frames.
+4. **Stage D — Reassembly (0.54s – 0.88s)**: Strips snap back edge-to-edge (`x: 0, y: 0, rotateY: 0, scaleY: 1`) into a pristine single widescreen monolith.
+
+### Giant Editorial Typography & Atmospheric Aura Cross-Fades
+- **Masked Vertical Slide**: Outgoing title translates up (`yPercent: -100`) while incoming title emerges from below (`yPercent: 100 -> 0`) behind the monolith frame in Cormorant Garamond.
+- **Double-Buffered Ambient Auras**: Pre-rendered radial gradients cross-fade smoothly without heavy per-frame CSS filter recalculations.
+- **Synchronized Metadata**: Film details dip and update in unison (`REEL 0X · DIRECTOR · YEAR · RUNTIME · SYNOPSIS`).
+- **Interactive Chapter Selector**: Minimal horizontal editorial navigation with Champagne Gold index, Ivory titles, and animated gold active underline.
+- **Functional Navigation Route**: Primary CTA routes directly to `/movies/:slug` (`MovieDetailsPage`), featuring technical specifications and back-to-experience navigation.
+- **Rapid-Click Policy**: Queues the latest requested film during active animations, ensuring state integrity and zero animation collisions.
+- **Accessibility & Motion Preference**: Gracefully falls back to a 0.35s opacity cross-fade when `prefers-reduced-motion` is active.
 
 ---
+
+## 6. Phase Roadmap & Future Boundaries
+- **Phase 04 (Future)**: Interactive auditorium seating plan, private screening curation, and ticket reservation.
 
 ## 5. Asset Strategy & Attribution
 - Film stills are stored locally under `public/images/gallery/` and `public/images/hero/`.

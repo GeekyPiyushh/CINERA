@@ -70,3 +70,20 @@
   border-color: rgba(198, 167, 124, 0.35);
   pointer-events: none;
 }
+
+/* Phase 03: 5-Strip Shutter Wave Container */
+.shutter-wave-container {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* Hide scrollbar for chapter selector */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

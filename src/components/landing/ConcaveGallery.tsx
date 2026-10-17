@@ -1,14 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { GALLERY_TILES } from '../../data/galleryLayout';
+import { FILMS } from '../../data/films';
 import { GalleryStage } from './GalleryStage';
 import { CinemaTile } from './CinemaTile';
 import { PerimeterHUD } from './PerimeterHUD';
 import { GalleryFallback } from './GalleryFallback';
 import { MonolithReveal } from './MonolithReveal';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
-import type { GalleryHUDState } from '../../types/cinema';
+import type { Film, GalleryHUDState } from '../../types/cinema';
 
 // Register ScrollTrigger with GSAP
 gsap.registerPlugin(ScrollTrigger);
@@ -17,6 +18,15 @@ export const ConcaveGallery: React.FC = () => {
   const [hoveredFilm, setHoveredFilm] = useState<GalleryHUDState['hoveredFilm']>(null);
   const [scrollProgress, setScrollProgress] = useState<number>(0);
   const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  // Active showcase film (Phase 03 Multiverse: Interstellar, Dark Knight, Dune 2, Oppenheimer)
+  const [activeFilm, setActiveFilm] = useState<Film>(FILMS[0]);
+  const [nextFilm, setNextFilm] = useState<Film | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
+
+  // Animation lock and queue refs to prevent overlapping transitions on rapid clicks
+  const isTransitioningRef = useRef<boolean>(false);
+  const queuedFilmRef = useRef<Film | null>(null);
 
   const prefersReducedMotion = useReducedMotion();
 
@@ -38,10 +48,18 @@ export const ConcaveGallery: React.FC = () => {
   // Stable refs for the 5 panorama slice layers (middle row)
   const panoramaLayerRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  // Phase 03: 5-Strip Shutter Wave and Double-Buffer Slice refs
+  const shutterRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const primarySliceRefs = useRef<(HTMLImageElement | null)[]>([]);
+  const secondarySliceRefs = useRef<(HTMLImageElement | null)[]>([]);
+
   // Act V Reveal refs
   const titleRef = useRef<HTMLDivElement>(null);
+  const titleIncomingRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
+  const glowIncomingRef = useRef<HTMLDivElement>(null);
   const metadataRef = useRef<HTMLDivElement>(null);
+  const metadataContentRef = useRef<HTMLDivElement>(null);
 
   // Responsive mobile check
   useEffect(() => {
@@ -55,7 +73,259 @@ export const ConcaveGallery: React.FC = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // GSAP ScrollTrigger Master Timeline
+  // Preload all four film panoramas on mount
+  useEffect(() => {
+    FILMS.forEach((film) => {
+      const img = new Image();
+      img.src = film.panoramaImage;
+    });
+  }, []);
+
+  const handleSelectFilmRef = useRef<(film: Film) => void>(() => {});
+
+  // -------------------------------------------------------------
+  // PHASE 03: FIVE-STRIP CINEMATIC SHUTTER TRANSITION CONTROLLER
+  // -------------------------------------------------------------
+  const handleSelectFilm = useCallback(
+    (targetFilm: Film) => {
+      // Ignore if already active
+      if (targetFilm.id === activeFilm.id) return;
+
+      // Rapid-click queueing policy: queue target film if already animating
+      if (isTransitioningRef.current) {
+        queuedFilmRef.current = targetFilm;
+        return;
+      }
+
+      isTransitioningRef.current = true;
+      setIsTransitioning(true);
+      setNextFilm(targetFilm);
+
+      // Pre-set secondary buffer image source across all 5 strips
+      secondarySliceRefs.current.forEach((img) => {
+        if (img) {
+          img.src = targetFilm.panoramaImage;
+        }
+      });
+
+      // Reduced motion fallback: clean opacity cross-fade
+      if (prefersReducedMotion) {
+        gsap.to(primarySliceRefs.current, {
+          opacity: 0,
+          duration: 0.35,
+          ease: 'power1.inOut',
+        });
+
+        gsap.to(secondarySliceRefs.current, {
+          opacity: 1,
+          duration: 0.35,
+          ease: 'power1.inOut',
+          onComplete: () => {
+            setActiveFilm(targetFilm);
+            setNextFilm(null);
+            primarySliceRefs.current.forEach((img) => {
+              if (img) img.src = targetFilm.panoramaImage;
+            });
+            gsap.set(primarySliceRefs.current, { opacity: 1 });
+            gsap.set(secondarySliceRefs.current, { opacity: 0 });
+
+            isTransitioningRef.current = false;
+            setIsTransitioning(false);
+
+            if (queuedFilmRef.current) {
+              const queued = queuedFilmRef.current;
+              queuedFilmRef.current = null;
+              handleSelectFilmRef.current(queued);
+            }
+          },
+        });
+        return;
+      }
+
+      // Master 4-Stage Shutter Wave Timeline
+      const shutterTL = gsap.timeline({
+        onComplete: () => {
+          setActiveFilm(targetFilm);
+          setNextFilm(null);
+
+          // Synchronize Buffer A to target panorama and reset Buffer B
+          primarySliceRefs.current.forEach((img) => {
+            if (img) img.src = targetFilm.panoramaImage;
+          });
+          gsap.set(primarySliceRefs.current, { opacity: 1 });
+          gsap.set(secondarySliceRefs.current, { opacity: 0 });
+
+          // Reset title positions
+          if (titleRef.current) {
+            gsap.set(titleRef.current, { yPercent: 0, opacity: 0.95 });
+          }
+          if (titleIncomingRef.current) {
+            gsap.set(titleIncomingRef.current, { yPercent: 100, opacity: 0 });
+          }
+
+          // Reset glow layers
+          if (glowRef.current) {
+            gsap.set(glowRef.current, {
+              opacity: 0.75,
+              backgroundImage: `radial-gradient(ellipse 75% 65% at 50% 50%, ${targetFilm.themeColors.glow} 0%, rgba(20, 10, 14, 0.85) 60%, #100B0D 100%)`,
+            });
+          }
+          if (glowIncomingRef.current) {
+            gsap.set(glowIncomingRef.current, { opacity: 0 });
+          }
+
+          // Restore metadata opacity
+          if (metadataContentRef.current) {
+            gsap.to(metadataContentRef.current, { opacity: 1, y: 0, duration: 0.25 });
+          }
+
+          isTransitioningRef.current = false;
+          setIsTransitioning(false);
+
+          // Process queued film if requested during animation
+          if (queuedFilmRef.current) {
+            const queued = queuedFilmRef.current;
+            queuedFilmRef.current = null;
+            handleSelectFilmRef.current(queued);
+          }
+        },
+      });
+
+      // Metadata Panel: slight dip and dim during transition
+      if (metadataContentRef.current) {
+        shutterTL.to(
+          metadataContentRef.current,
+          { opacity: 0.35, y: 6, duration: 0.2, ease: 'power1.out' },
+          0,
+        );
+      }
+
+      // -------------------------------------------------------------
+      // STAGE A — RELEASE (0.00s to 0.18s)
+      // Five strips separate horizontally by 5.5px deliberate gap
+      // -------------------------------------------------------------
+      shutterRefs.current.forEach((stripEl, i) => {
+        if (!stripEl) return;
+        const gapX = (i - 2) * 5.5; // Strip 0: -11px, Strip 1: -5.5px, Strip 2: 0px, Strip 3: +5.5px, Strip 4: +11px
+        shutterTL.to(
+          stripEl,
+          {
+            x: gapX,
+            duration: 0.18,
+            ease: 'power1.out',
+          },
+          0,
+        );
+      });
+
+      // -------------------------------------------------------------
+      // STAGE B — CINEMATIC WAVE (0.18s to 0.54s)
+      // Staggered wave across 5 strips with alternate Y and rotateY
+      // -------------------------------------------------------------
+      const waveY = [-18, 18, -18, 18, -18];
+      const waveRot = [-4.5, 4.5, -4.5, 4.5, -4.5];
+
+      shutterRefs.current.forEach((stripEl, i) => {
+        if (!stripEl) return;
+        shutterTL.to(
+          stripEl,
+          {
+            y: waveY[i],
+            rotateY: waveRot[i],
+            scaleY: 0.95,
+            duration: 0.32,
+            ease: 'power2.inOut',
+          },
+          0.18 + i * 0.045,
+        );
+      });
+
+      // -------------------------------------------------------------
+      // STAGE C — IMAGE REPLACEMENT AT APEX (0.32s to 0.54s)
+      // Double-buffered cross-fade between Buffer A and Buffer B
+      // -------------------------------------------------------------
+      secondarySliceRefs.current.forEach((secImg, i) => {
+        const priImg = primarySliceRefs.current[i];
+        if (secImg) {
+          shutterTL.to(
+            secImg,
+            { opacity: 1, duration: 0.22, ease: 'power1.inOut' },
+            0.32,
+          );
+        }
+        if (priImg) {
+          shutterTL.to(
+            priImg,
+            { opacity: 0, duration: 0.22, ease: 'power1.inOut' },
+            0.32,
+          );
+        }
+      });
+
+      // Giant Typography Transition (Masked Vertical Reveal)
+      if (titleRef.current) {
+        shutterTL.to(
+          titleRef.current,
+          { yPercent: -100, opacity: 0, duration: 0.3, ease: 'power2.in' },
+          0.2,
+        );
+      }
+
+      if (titleIncomingRef.current) {
+        shutterTL.fromTo(
+          titleIncomingRef.current,
+          { yPercent: 100, opacity: 0 },
+          { yPercent: 0, opacity: 0.95, duration: 0.36, ease: 'power2.out' },
+          0.34,
+        );
+      }
+
+      // Background Aura Cross-fade
+      if (glowIncomingRef.current) {
+        shutterTL.to(
+          glowIncomingRef.current,
+          { opacity: 0.75, duration: 0.45, ease: 'power1.inOut' },
+          0.24,
+        );
+      }
+      if (glowRef.current) {
+        shutterTL.to(
+          glowRef.current,
+          { opacity: 0, duration: 0.45, ease: 'power1.inOut' },
+          0.24,
+        );
+      }
+
+      // -------------------------------------------------------------
+      // STAGE D — REASSEMBLY (0.54s to 0.88s)
+      // Five strips lock edge-to-edge at x: 0, y: 0, rotateY: 0, scaleY: 1
+      // -------------------------------------------------------------
+      shutterRefs.current.forEach((stripEl, i) => {
+        if (!stripEl) return;
+        shutterTL.to(
+          stripEl,
+          {
+            x: 0,
+            y: 0,
+            rotateY: 0,
+            scaleY: 1,
+            duration: 0.3,
+            ease: 'power2.out',
+          },
+          0.54 + i * 0.035,
+        );
+      });
+    },
+    [activeFilm.id, prefersReducedMotion],
+  );
+
+  useEffect(() => {
+    handleSelectFilmRef.current = handleSelectFilm;
+  }, [handleSelectFilm]);
+
+  // -------------------------------------------------------------
+  // GSAP SCROLLTRIGGER CONVERGENCE TIMELINE (Phase 02 Baseline)
+  // -------------------------------------------------------------
   useEffect(() => {
     if (isMobile || prefersReducedMotion || !containerRef.current || !pinRef.current) {
       return;
@@ -174,8 +444,6 @@ export const ConcaveGallery: React.FC = () => {
         const cardEl = cardRefs.current[tileIdx];
 
         // Delta X from column track center to strip center
-        // Center strip (index 2): deltaX = 0
-        // Wings: deltaX moves inward toward center
         const deltaX = (stripIndex - 2) * (stripWidth - trackWidth);
 
         if (tileEl) {
@@ -246,7 +514,7 @@ export const ConcaveGallery: React.FC = () => {
 
       // -------------------------------------------------------------
       // ACT V — MONOLITH REVEAL (Progress: 0.65 to 1.00)
-      // Giant INTERSTELLAR typography emerges behind frame, glow blooms,
+      // Giant editorial typography emerges behind frame, glow blooms,
       // metadata and Explore CTA appear below.
       // -------------------------------------------------------------
       if (titleRef.current) {
@@ -302,7 +570,12 @@ export const ConcaveGallery: React.FC = () => {
   }, [isMobile, prefersReducedMotion]);
 
   if (isMobile) {
-    return <GalleryFallback />;
+    return (
+      <GalleryFallback
+        activeFilm={activeFilm}
+        onSelectFilm={handleSelectFilm}
+      />
+    );
   }
 
   const isScrolled = scrollProgress > 0.01;
@@ -319,11 +592,18 @@ export const ConcaveGallery: React.FC = () => {
         {/* Stationary Perimeter HUD */}
         <PerimeterHUD hoveredFilm={hoveredFilm} scrollProgress={scrollProgress} />
 
-        {/* Monolith Reveal Layers (Giant Title, Background Glow, Metadata) */}
+        {/* Monolith Reveal Layers (Giant Title, Background Glow, Metadata & Chapter Navigation) */}
         <MonolithReveal
+          activeFilm={activeFilm}
+          nextFilm={nextFilm}
+          onSelectFilm={handleSelectFilm}
+          isTransitioning={isTransitioning}
           titleRef={titleRef}
+          titleIncomingRef={titleIncomingRef}
           glowRef={glowRef}
+          glowIncomingRef={glowIncomingRef}
           metadataRef={metadataRef}
+          metadataContentRef={metadataContentRef}
         />
 
         {/* 3D Concave Gallery Stage with Decoupled Pointer Inertia */}
@@ -356,6 +636,24 @@ export const ConcaveGallery: React.FC = () => {
                       panoramaLayerRefs.current[stripIndex] = el;
                     }
                   }}
+                  shutterRef={(el) => {
+                    if (isMiddleRow && stripIndex !== undefined) {
+                      shutterRefs.current[stripIndex] = el;
+                    }
+                  }}
+                  primarySliceRef={(el) => {
+                    if (isMiddleRow && stripIndex !== undefined) {
+                      primarySliceRefs.current[stripIndex] = el;
+                    }
+                  }}
+                  secondarySliceRef={(el) => {
+                    if (isMiddleRow && stripIndex !== undefined) {
+                      secondarySliceRefs.current[stripIndex] = el;
+                    }
+                  }}
+                  currentPanorama={activeFilm.panoramaImage}
+                  incomingPanorama={nextFilm?.panoramaImage}
+                  activeFilmSlug={activeFilm.slug}
                   tile={tile}
                   isActive={isActive}
                   onHover={setHoveredFilm}

@@ -110,11 +110,29 @@ cinera/
 - **Archival Metadata & CTA**: Minimal film details (`REEL 01 · CHRISTOPHER NOLAN · 2014 · 169 MIN`) and `EXPLORE ALL MOVIES →` action button.
 - **Responsive Mobile Showcase**: Clean vertical editorial presentation on mobile devices with featured 3-strip *Interstellar* panorama showcase.
 
+### Phase 03: The Cinematic Multiverse (Interactive Four-Film Showcase)
+- **Four Distinct Cinematic Universes**: Full synchronization across 4 canonical masterpieces: *Interstellar* (Reel 01), *The Dark Knight* (Reel 02), *Dune: Part Two* (Reel 03), and *Oppenheimer* (Reel 04).
+- **Five-Strip Cinematic Shutter Transition**:
+  - *Stage A (Release)*: Strips separate horizontally by a deliberate 5.5px gap.
+  - *Stage B (Cinematic Wave)*: Staggered sinusoidal wave with alternating Y-translation (±18px), perspective rotation (±4.5°), and scale compression.
+  - *Stage C (Double-Buffered Image Replacement)*: Seamless cross-fade between Buffer A and Buffer B at the wave apex without blank frames.
+  - *Stage D (Reassembly)*: Snaps back edge-to-edge into a continuous widescreen monolith.
+- **Giant Editorial Typography Transitions**: Masked vertical reveals rising from below behind the frame in Cormorant Garamond with responsive clamp-based typography (`clamp(2.5rem, 8.5vw, 11.5vw)`).
+- **Ambient Atmosphere Switching**: Pre-rendered radial gradients cross-fading smoothly to match each film's aura:
+  - *Interstellar*: `#481B29` (Cosmic / Expansive)
+  - *The Dark Knight*: `#1A222D` (Noir / Architectural)
+  - *Dune: Part Two*: `#5A2618` (Desert Heat / Monumental)
+  - *Oppenheimer*: `#4E2015` (Incandescent / Volatile)
+- **Minimal Editorial Chapter Selector**: Horizontal navigation beneath the monolith with Champagne Gold indexing, Warm Ivory titles, animated active indicator underline, and full keyboard navigation.
+- **Dedicated Film Dossier Route**: Functional `/movies/:slug` pages for each film with technical specifications, synopsis, and seamless back navigation to the gallery.
+- **Robust State Management**: Thread-safe rapid-click queueing policy, preventing animation collisions and broken slice alignments.
+- **Accessibility & Reduced Motion**: Automatically falls back to a clean 0.35s opacity cross-fade when `prefers-reduced-motion` is detected.
+
 ---
 
 ## Roadmap
 
-- **Phase 03**: *Monolith Portal & Film Switching* — Reel switching between the 4 iconic films, shutter / iris transitions, interactive seat map, and booking reservation flow.
+- **Phase 04**: *Auditorium Curation & Private Screening Portal* — Architectural seat selection, private screening booking flow, and ticketing.
 
 ---
 

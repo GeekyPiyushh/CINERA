@@ -1,21 +1,31 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FILMS } from '../../data/films';
+import type { Film } from '../../types/cinema';
 import { BrandWordmark } from '../ui/BrandWordmark';
+import { FilmChapterSelector } from './FilmChapterSelector';
 
 /**
  * GalleryFallback
  * Lightweight, luxurious mobile presentation for CINÉRA.
  * Replaces expensive 3D CSS transforms with a clean editorial composition.
  */
-export const GalleryFallback: React.FC = () => {
+interface GalleryFallbackProps {
+  activeFilm?: Film;
+  onSelectFilm?: (film: Film) => void;
+}
+
+export const GalleryFallback: React.FC<GalleryFallbackProps> = ({
+  activeFilm = FILMS[0],
+  onSelectFilm,
+}) => {
   return (
-    <div className="relative min-h-screen bg-[#100B0D] text-[#F5E9DD] px-6 py-12 flex flex-col justify-between">
-      {/* Soft Burgundy atmospheric background glow */}
+    <div className="relative min-h-screen bg-[#100B0D] text-[#F5E9DD] px-6 py-12 flex flex-col justify-between selection:bg-[#C6A77C] selection:text-[#100B0D]">
+      {/* Dynamic atmospheric background glow */}
       <div
-        className="fixed inset-0 pointer-events-none"
+        className="fixed inset-0 pointer-events-none transition-colors duration-1000"
         style={{
-          background: 'radial-gradient(circle at 50% 20%, rgba(72, 27, 41, 0.45) 0%, rgba(16, 11, 13, 0.95) 75%)',
+          background: `radial-gradient(circle at 50% 20%, ${activeFilm.themeColors.glow} 0%, rgba(16, 11, 13, 0.95) 75%)`,
         }}
       />
 
@@ -32,7 +42,7 @@ export const GalleryFallback: React.FC = () => {
         {FILMS.map((film, index) => (
           <Link
             key={film.id}
-            to="/movies"
+            to={`/movies/${film.slug}`}
             className="group block relative overflow-hidden border border-[#C6A77C]/25 bg-[#100B0D]/80 shadow-[0_15px_30px_rgba(0,0,0,0.8)]"
           >
             <div className="aspect-[16/9] overflow-hidden relative">
@@ -65,11 +75,20 @@ export const GalleryFallback: React.FC = () => {
         ))}
       </div>
 
-      {/* Mobile Featured Cinema Monolith Section (Phase 02 Mobile Transformation) */}
+      {/* Mobile Featured Cinema Monolith Section (Phase 03 Multiverse) */}
       <div className="relative z-10 my-10 pt-8 border-t border-[#C6A77C]/20 text-center space-y-6">
         <div className="font-mono text-[10px] tracking-[0.25em] text-[#C6A77C] uppercase">
           FEATURED REPERTORY MONOLITH
         </div>
+
+        {/* Four-Film Chapter Selector */}
+        {onSelectFilm && (
+          <FilmChapterSelector
+            films={FILMS}
+            activeFilmId={activeFilm.id}
+            onSelectFilm={onSelectFilm}
+          />
+        )}
 
         {/* 3-Strip Mobile Panoramic Monolith */}
         <div className="relative overflow-hidden border border-[#C6A77C]/40 shadow-[0_20px_50px_rgba(0,0,0,0.95)]">
@@ -77,9 +96,9 @@ export const GalleryFallback: React.FC = () => {
             {[0, 1, 2].map((stripIdx) => (
               <div key={stripIdx} className="relative h-full overflow-hidden border-r border-[#C6A77C]/15 last:border-r-0">
                 <img
-                  src="/images/hero/interstellar.jpg"
-                  alt="Interstellar Cinema Frame"
-                  className="absolute top-0 h-full max-w-none object-cover"
+                  src={activeFilm.panoramaImage}
+                  alt={`${activeFilm.title} Cinema Frame`}
+                  className="absolute top-0 h-full max-w-none object-cover transition-opacity duration-500"
                   style={{
                     width: '300%',
                     left: `-${stripIdx * 100}%`,
@@ -90,18 +109,29 @@ export const GalleryFallback: React.FC = () => {
           </div>
         </div>
 
-        {/* Oversized Interstellar Title */}
-        <div className="font-serif text-4xl sm:text-5xl tracking-[0.16em] uppercase text-[#F5E9DD] leading-none pt-2">
-          INTERSTELLAR
+        {/* Oversized Film Title */}
+        <div className="font-serif text-3xl sm:text-5xl tracking-[0.14em] uppercase text-[#F5E9DD] leading-none pt-2">
+          {activeFilm.title.toUpperCase()}
         </div>
 
         {/* Mobile Metadata */}
         <div className="flex justify-center items-center gap-3 font-mono text-[10px] tracking-[0.2em] text-[#F5E9DD]/70 uppercase">
-          <span>CHRISTOPHER NOLAN</span>
+          <span>{activeFilm.director}</span>
           <span className="w-1 h-1 rounded-full bg-[#C6A77C]" />
-          <span>2014</span>
+          <span>{activeFilm.year}</span>
           <span className="w-1 h-1 rounded-full bg-[#C6A77C]" />
-          <span>169 MIN</span>
+          <span>{activeFilm.runtime}</span>
+        </div>
+
+        {/* Action Link to Film Details */}
+        <div className="pt-2">
+          <Link
+            to={`/movies/${activeFilm.slug}`}
+            className="inline-flex items-center gap-2 px-6 py-2 border border-[#C6A77C]/50 text-xs font-mono tracking-[0.2em] uppercase text-[#F5E9DD] hover:bg-[#C6A77C]/15 transition-colors"
+          >
+            <span>Explore {activeFilm.title}</span>
+            <span className="text-[#C6A77C]">→</span>
+          </Link>
         </div>
       </div>
 

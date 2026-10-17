@@ -2,22 +2,29 @@
  * CINÉRA — Types for the Concave Cinema Gallery
  */
 
+export interface FilmThemeColors {
+  primary: string;
+  accent: string;
+  glow: string; // Ambient aura color
+}
+
 export interface Film {
   id: string;
+  slug: string;
+  reelNumber: string; // e.g. "01", "02", "03", "04"
   title: string;
   director: string;
   year: number;
-  runtime: string; // e.g. "169 min"
+  runtime: string; // e.g. "169 MIN"
   description: string;
   atmosphere: string; // e.g. "Deep cosmic burgundy and gold"
-  themeColors: {
-    primary: string;
-    accent: string;
-    glow: string;
-  };
-  image: string;
+  themeColors: FilmThemeColors;
+  image: string; // gallery thumbnail / still
+  panoramaImage: string; // high-res wide panorama for monolith
   imageAlt: string;
 }
+
+export type TransitionState = 'idle' | 'transitioning';
 
 export interface GalleryTile {
   id: string;

@@ -12,6 +12,12 @@ interface CinemaTileProps {
   cardRef?: (el: HTMLElement | null) => void;
   imageLayerRef?: (el: HTMLDivElement | null) => void;
   panoramaLayerRef?: (el: HTMLDivElement | null) => void;
+  shutterRef?: (el: HTMLDivElement | null) => void;
+  primarySliceRef?: (el: HTMLImageElement | null) => void;
+  secondarySliceRef?: (el: HTMLImageElement | null) => void;
+  currentPanorama?: string;
+  incomingPanorama?: string;
+  activeFilmSlug?: string;
 }
 
 export const CinemaTile = forwardRef<HTMLDivElement, CinemaTileProps>(
@@ -25,6 +31,12 @@ export const CinemaTile = forwardRef<HTMLDivElement, CinemaTileProps>(
       cardRef,
       imageLayerRef,
       panoramaLayerRef,
+      shutterRef,
+      primarySliceRef,
+      secondarySliceRef,
+      currentPanorama = '/images/hero/interstellar.jpg',
+      incomingPanorama,
+      activeFilmSlug,
     },
     ref,
   ) => {
@@ -61,6 +73,8 @@ export const CinemaTile = forwardRef<HTMLDivElement, CinemaTileProps>(
     const handleMouseLeave = () => {
       onHover(null);
     };
+
+    const targetMovieRoute = activeFilmSlug ? `/movies/${activeFilmSlug}` : '/movies';
 
     return (
       <div
@@ -103,24 +117,47 @@ export const CinemaTile = forwardRef<HTMLDivElement, CinemaTileProps>(
               ref={panoramaLayerRef}
               className="panorama-slice-layer absolute inset-0 w-full h-full overflow-hidden pointer-events-none opacity-0"
             >
-              <img
-                src="/images/hero/interstellar.jpg"
-                alt="Interstellar Cinema Monolith Frame"
-                loading="eager"
-                className="absolute top-0 h-full max-w-none select-none pointer-events-none"
-                style={{
-                  width: '500%',
-                  left: `-${stripIndex * 100}%`,
-                  objectFit: 'cover',
-                }}
-              />
-              {/* Outer edge subtle shadow for monolith wings */}
-              {stripIndex === 0 && (
-                <div className="absolute top-0 bottom-0 left-0 w-12 pointer-events-none bg-gradient-to-r from-[#100B0D]/70 to-transparent" />
-              )}
-              {stripIndex === 4 && (
-                <div className="absolute top-0 bottom-0 right-0 w-12 pointer-events-none bg-gradient-to-l from-[#100B0D]/70 to-transparent" />
-              )}
+              {/* Isolated Shutter Wave Container for 5-Strip Cinematic Wave */}
+              <div
+                ref={shutterRef}
+                className="shutter-wave-container relative w-full h-full preserve-3d will-change-transform"
+              >
+                {/* Buffer A: Current Active Panorama Slice */}
+                <img
+                  ref={primarySliceRef}
+                  src={currentPanorama}
+                  alt="Active Cinema Monolith Frame"
+                  loading="eager"
+                  className="panorama-slice-primary absolute top-0 h-full max-w-none select-none pointer-events-none"
+                  style={{
+                    width: '500%',
+                    left: `-${stripIndex * 100}%`,
+                    objectFit: 'cover',
+                  }}
+                />
+
+                {/* Buffer B: Incoming Panorama Slice (Double-Buffered for zero-flicker transitions) */}
+                <img
+                  ref={secondarySliceRef}
+                  src={incomingPanorama || currentPanorama}
+                  alt="Incoming Cinema Monolith Frame"
+                  loading="eager"
+                  className="panorama-slice-secondary absolute top-0 h-full max-w-none select-none pointer-events-none opacity-0"
+                  style={{
+                    width: '500%',
+                    left: `-${stripIndex * 100}%`,
+                    objectFit: 'cover',
+                  }}
+                />
+
+                {/* Outer edge subtle shadow for monolith wings */}
+                {stripIndex === 0 && (
+                  <div className="absolute top-0 bottom-0 left-0 w-12 pointer-events-none bg-gradient-to-r from-[#100B0D]/70 to-transparent" />
+                )}
+                {stripIndex === 4 && (
+                  <div className="absolute top-0 bottom-0 right-0 w-12 pointer-events-none bg-gradient-to-l from-[#100B0D]/70 to-transparent" />
+                )}
+              </div>
             </div>
           )}
 
@@ -136,7 +173,7 @@ export const CinemaTile = forwardRef<HTMLDivElement, CinemaTileProps>(
 
           {/* Accessible interactive link overlay */}
           <Link
-            to="/movies"
+            to={targetMovieRoute}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             onFocus={handleMouseEnter}
