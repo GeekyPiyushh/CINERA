@@ -71,12 +71,14 @@ export interface GalleryTile {
   image: string;
   imageAlt: string;
   aspectRatio: 'portrait' | 'landscape' | 'panoramic';
+  category?: 'Hollywood' | 'Bollywood' | 'South Indian Cinema';
   nx: number; // normalized horizontal position [-1, 1]
   ny: number; // normalized vertical position [-1, 1]
   depth: number;
   rotateY: number;
   rotateX: number;
   scale: number;
+  objectPosition?: string;
 }
 
 export interface GalleryHUDState {

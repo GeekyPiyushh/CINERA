@@ -74,7 +74,12 @@ export const CinemaTile = forwardRef<HTMLDivElement, CinemaTileProps>(
       onHover(null);
     };
 
-    const targetMovieRoute = activeFilmSlug ? `/movies/${activeFilmSlug}` : '/movies';
+    const isFeaturedFilm = ['interstellar', 'the-dark-knight', 'dune-part-two', 'oppenheimer'].includes(tile.filmId);
+    const targetMovieRoute = isMiddleRow && activeFilmSlug
+      ? `/movies/${activeFilmSlug}`
+      : isFeaturedFilm
+      ? `/movies/${tile.filmId}`
+      : '/movies';
 
     return (
       <div
@@ -96,6 +101,7 @@ export const CinemaTile = forwardRef<HTMLDivElement, CinemaTileProps>(
               alt={tile.imageAlt}
               loading="lazy"
               onError={() => setImageError(true)}
+              style={{ objectPosition: tile.objectPosition || 'center center' }}
               className="w-full h-full object-cover select-none transition-transform duration-700 ease-out group-hover:scale-105"
             />
 
